@@ -38,7 +38,7 @@
             <span>ou</span>
             <button id="tab">Pessoa Física</button>
         </div>
-        <form action="cadastroCpf.php" method="post">
+        <form id="formPessoa" action="cadastroCpf.php" method="post" enctype="multipart/form-data">
             <div class="register-box">
                 <div class="row">
                     <div class="col">
@@ -80,7 +80,7 @@
                     </div>
                     <div class="col">
                         <label>Foto de Perfil:</label>
-                        <input type="file" class="form-control" name="foto">
+                        <input type="file" class="form-control" name="foto" accept="image/*">
                     </div>
                 </div>
 
@@ -92,7 +92,7 @@
     </div>
     </form>
 
-
+<script src="cadastrocpf.js"></script>
 </body>
 
 </html>

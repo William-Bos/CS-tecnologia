@@ -10,8 +10,8 @@ if (!isset($_SESSION['email'])) {
 $id = $_POST['id'];
 $acao = $_POST['acao'];
 
-// Update
-if ($acao == 'update') {
+// UPDATE
+if ($acao === 'update') {
     $instituicao = trim($_POST['instituicao']);
     $endereco = trim($_POST['endereco']);
     $cnpj = trim($_POST['cnpj']);
@@ -21,12 +21,16 @@ if ($acao == 'update') {
     $senha = $_POST['senha'];
     $foto = $_FILES['foto'];
     $maps_link = $_POST['maps_link'] ?? '';
+    $latitude = $_POST['latitude'] ?? null;
+    $longitude = $_POST['longitude'] ?? null;
 
-    $query = "UPDATE instituicao SET instituicao=?, endereco=?, cnpj=?, numero=?, email=?, cep=?, link=?";
-    $params = [$instituicao, $endereco, $cnpj, $numero, $email, $cep, $maps_link];
-    $types = "sssssss";
+    // Montar query base
+    $query = "UPDATE instituicao 
+              SET instituicao=?, endereco=?, cnpj=?, numero=?, email=?, cep=?, link=?, latitude=?, longitude=?";
+    $params = [$instituicao, $endereco, $cnpj, $numero, $email, $cep, $maps_link, $latitude, $longitude];
+    $types = "sssssssss";
 
-    // Se senha foi preenchida, atualiza
+    // Se enviou nova senha
     if (!empty($senha)) {
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
         $query .= ", senha=?";
@@ -34,38 +38,41 @@ if ($acao == 'update') {
         $params[] = $senhaHash;
     }
 
-    // Se nova foto enviada, atualiza
+    // Se enviou nova imagem
     if (!empty($foto['name'])) {
         $pasta = "../Assets/uploads/";
-        $nomeDoArquivo = uniqid() . "-" . $foto['name'];
+        $nomeDoArquivo = uniqid() . "-" . basename($foto['name']);
         $caminho = $pasta . $nomeDoArquivo;
-        move_uploaded_file($foto['tmp_name'], $caminho);
 
-        $query .= ", imagem_instituicao=?";
-        $types .= "s";
-        $params[] = $caminho;
+        if (move_uploaded_file($foto['tmp_name'], $caminho)) {
+            $query .= ", imagem_instituicao=?";
+            $types .= "s";
+            $params[] = $caminho;
+        }
     }
 
+    // Finaliza query
     $query .= " WHERE id=?";
     $types .= "i";
     $params[] = $id;
 
+    // Prepara e executa
     $stmt = $conn->prepare($query);
     $stmt->bind_param($types, ...$params);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Dados atualizados com sucesso!'); window.location='painel_update.php';</script>";
+        echo "<script>alert('Dados atualizados com sucesso!'); window.location='update.php';</script>";
     } else {
         echo "Erro ao atualizar: " . $stmt->error;
     }
 }
 
-// Delete
-if ($acao == 'delete') {
+// DELETE
+elseif ($acao === 'delete') {
     $stmt = $conn->prepare("DELETE FROM instituicao WHERE id=?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
-        session_destroy(); // encerra sessão após deletar
+        session_destroy();
         echo "<script>alert('Conta deletada com sucesso!'); window.location='../login/index.html';</script>";
     } else {
         echo "Erro ao deletar: " . $stmt->error;

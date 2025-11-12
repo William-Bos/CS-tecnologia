@@ -1,5 +1,4 @@
 <?php
-
 require '../conexão.php';
 
 $instituicao = trim($_POST['instituicao'] ?? '');
@@ -11,41 +10,35 @@ $cep = trim($_POST['cep'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 $foto = $_FILES['foto'] ?? null;
+$latitude = $_POST['latitude'] ?? '';
+$longitude = $_POST['longitude'] ?? '';
 $maps_link = $_POST['maps_link'] ?? '';
 
 if (
-    empty($instituicao) ||
-    empty($endereco) ||
-    empty($cnpj) ||
-    empty($numero) ||
-    empty($email) ||
-    empty($cep) ||
-    empty($senha) ||
-    empty($maps_link) ||
+    empty($instituicao) || empty($endereco) || empty($cnpj) ||
+    empty($numero) || empty($email) || empty($cep) ||
+    empty($senha) || empty($latitude) || empty($longitude) ||
     empty($foto['name'])
 ) {
     echo "<script>alert('Preencha todos os campos antes de continuar!'); history.back();</script>";
     exit;
 }
 
-
 $pasta = "../Assets/uploads/";
-
 $nomeDoArquivo = uniqid() . "-" . $foto['name'];
-
 $caminho = $pasta . $nomeDoArquivo;
-
 move_uploaded_file($foto['tmp_name'], $caminho);
 
+$sql = "INSERT INTO instituicao (instituicao, endereco, cnpj, numero, email, cep, senha, imagem_instituicao, latitude, longitude, link) 
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
-$sql = "INSERT INTO instituicao (instituicao, endereco, cnpj, numero, email, cep, senha, imagem_instituicao, link) VALUES (?,?,?,?,?,?,?,?,?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("sssssssss", $instituicao, $endereco, $cnpj, $numero, $email, $cep, $senhaHash, $caminho, $maps_link);
+$stmt->bind_param("ssssssssdds", $instituicao, $endereco, $cnpj, $numero, $email, $cep, $senhaHash, $caminho, $latitude, $longitude, $maps_link);
+
 if ($stmt->execute()) {
-     header("Location: ../login/index.html");
-    exit; // Sempre use exit após o header para evitar execução do restante do código
+    header("Location: ../login/index.html");
+    exit;
 } else {
     echo "Erro: " . $stmt->error;
 }
-
-
+?>

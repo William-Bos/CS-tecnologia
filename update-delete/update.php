@@ -2,7 +2,7 @@
 session_start();
 require '../conexão.php';
 
-// Verifica se usuário está logado
+// Verifica se o usuário está logado
 if (!isset($_SESSION['email'])) {
     header("Location: ../login/index.html");
     exit;
@@ -32,6 +32,15 @@ $usuario = $result->fetch_assoc();
     <title>Painel - Update/Deletar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="update.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body class="p-5">
@@ -48,17 +57,19 @@ $usuario = $result->fetch_assoc();
 
         <div class="mb-3">
             <label>Endereço:</label>
-            <input type="text" name="endereco" class="form-control" value="<?= $usuario['endereco'] ?>" required>
+            <input type="text" id="endereco" name="endereco" class="form-control" value="<?= $usuario['endereco'] ?>" required>
         </div>
 
         <div class="mb-3">
             <label>Link do Google Maps:</label>
-            <input type="url" name="maps_link" class="form-control"
+            <input type="url" id="maps_link" name="maps_link" class="form-control"
                 value="<?= htmlspecialchars($usuario['link']) ?>"
                 placeholder="Cole aqui o link do Google Maps">
         </div>
 
-        <div class="mb-3">
+        <div id="map"></div>
+
+        <div class="mb-3 mt-3">
             <label>CNPJ:</label>
             <input type="text" name="cnpj" class="form-control" value="<?= $usuario['cnpj'] ?>" required>
         </div>
@@ -90,11 +101,17 @@ $usuario = $result->fetch_assoc();
                 <img src="<?= $usuario['imagem_instituicao'] ?>" width="100" class="mt-2">
             <?php endif; ?>
         </div>
+        <input type="hidden" name="latitude" id="latitude" value="<?= $usuario['latitude'] ?>">
+        <input type="hidden" name="longitude" id="longitude" value="<?= $usuario['longitude'] ?>">
+
 
         <button type="submit" name="acao" value="update" class="btn btn-primary">Atualizar</button>
         <button type="submit" name="acao" value="delete" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja deletar?');">Deletar</button>
+        <button type="button" class="btn btn-success" onclick="window.location.href='http://localhost:8080/cs/';">Home</button>
     </form>
 
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="update.js"></script>
 </body>
 
 </html>

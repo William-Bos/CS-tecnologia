@@ -1,13 +1,12 @@
 <?php
+
+
 require 'conexão.php';
 
-// Buscar todas as instituições cadastradas
-$sql = "SELECT instituicao, endereco, cep, imagem_instituicao, link FROM instituicao";
+// Buscar todas as instituições com latitude e longitude
+$sql = "SELECT instituicao, endereco, cep, imagem_instituicao, link, latitude, longitude FROM instituicao";
 $result = $conn->query($sql);
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +24,7 @@ $result = $conn->query($sql);
     <div class="header">
         <div class="elements">
             <div class="icon">
-                <img src="/Assets/fenix.png" alt="">
+                <img src="Assets/fenix.png" alt="Logo">
             </div>
             <div class="title">CS Tecnológia</div>
         </div>
@@ -44,19 +43,15 @@ $result = $conn->query($sql);
                 <div class="offcanvas-body" id="body">
 
                     <div class="form-login">
-                        <div class="img-perfil" id="pfp">
-                            <img src="https://i.pinimg.com/originals/9f/16/72/9f1672710cba6bcb0dfd93201c6d4c00.jpg" alt="Usuário">
+
+                        <div class="text">
+                            Que tal cadastrar sua instituição em nosso site e se juntar a essa causa?
                         </div>
-
-                        <label for="email" id="texte">E-mail:</label>
-                        <input type="email" id="email" class="form-control">
-
-                        <label for="senha" id="texts">Senha:</label>
-                        <input type="password" id="senha" class="form-control">
                         <div class="botoes">
-                            <button class="btn btn-light mt-3" id="log">Acessar</button>
-                            <button class="btn btn-outline-light mt-2" id="cadas">Cadastre-se</button>
+                            <button class="btn btn-light mt-3" id="log">Já Possuo uma Conta</button>
+                            <button class="btn btn-outline-light mt-2" id="cadas">Cadastre-se Aqui!</button>
                         </div>
+
                     </div>
 
                 </div>
@@ -77,7 +72,7 @@ $result = $conn->query($sql);
 
 
     <div class="banner">
-        <img src="/Assets/banner.png" alt="">
+        <img src="Assets/banner.png" alt="banner">
     </div>
 
     <div class="search">
@@ -95,7 +90,9 @@ $result = $conn->query($sql);
 
         <?php if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="box">
+                <div class="box"
+                    data-lat="<?= htmlspecialchars($row['latitude']) ?>"
+                    data-lng="<?= htmlspecialchars($row['longitude']) ?>">
                     <div class="img">
                         <img src="<?= !empty($row['imagem_instituicao']) ? htmlspecialchars(str_replace('../', '', $row['imagem_instituicao'])) : '/Assets/default_instituicao.jpg' ?>" alt="">
                     </div>
@@ -105,15 +102,16 @@ $result = $conn->query($sql);
                         <div class="cep">CEP: <?= htmlspecialchars($row['cep']) ?></div>
                         <div class="distancia">
                             <div class="text">Distância:</div>
-                            <div class="km">2km</div>
+                            <div class="km">Calculando...</div>
                         </div>
                     </div>
                     <div class="button">
-                        <div class="text"> <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank">
-                                Abrir no Maps
-                            </a></div>
+                        <div class="text">
+                            <a href="<?= htmlspecialchars($row['link']) ?>" target="_blank">Consultar</a>
+                        </div>
                     </div>
                 </div>
+
             <?php endwhile; ?>
         <?php else: ?>
             <p>Nenhuma instituição cadastrada.</p>
@@ -128,7 +126,7 @@ $result = $conn->query($sql);
             <div class="row">
                 <div class="title2">Consulta de instituições</div>
                 <div class="exempled">
-                    <div class="desc">Após o cadastro, você poderá vincular os postos sob sua responsabilidade e, por meio de uma interface em tabela, atualizar você mesmo os preços e os tipos de combustíveis oferecidos.</div>
+                    <div class="desc">Nosso objetivo é facilitar a comunicação entre instituições que disponibilizam acesso à internet e os Centros de Referência de Assistência Social (CRAS), promovendo inclusão digital e ampliando o acesso da comunidade a serviços online essenciais.</div>
                 </div>
             </div>
             <div class="img"><img src="https://vestibulares.estrategia.com/portal/wp-content/uploads/2022/11/azzedine-rouichi-1afBUZcesB8-unsplash.jpg" alt=""></div>
@@ -138,7 +136,7 @@ $result = $conn->query($sql);
             <div class="row">
                 <div class="title2">Integração ao CRAS</div>
                 <div class="exempled">
-                    <div class="desc">Com filtros inteligentes, você seleciona o tipo de combustível e visualiza facilmente os preços e a localização dos postos.</div>
+                    <div class="desc">O portal conecta os Centros de Referência de Assistência Social às instituições cadastradas, facilitando parcerias e ampliando o acesso à internet para quem mais precisa.</div>
                 </div>
             </div>
             <div class="img"><img src="https://tubarao.sc.gov.br/uploads/sites/265/2025/08/WhatsApp-Image-2025-08-29-at-10.24.51.jpeg" alt=""></div>
@@ -146,6 +144,7 @@ $result = $conn->query($sql);
     </div>
     </div>
 
+    <script src="index.js"></script>
 </body>
 
 </html>
